@@ -1,8 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Navbar from "../../components/Navbar/Navbar";
-import Sidebar from "../../components/Sidebar/Sidebar";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -46,38 +44,25 @@ function Dashboard() {
     getProfile();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userName");
-    setUser(null);
-    navigate("/login");
-  };
-
   return (
-    <div>
-      <Navbar onLogout={handleLogout} userName={user?.first_name} />
-      <div className="d-flex">
-        <Sidebar />
-        <main className="flex-grow-1 p-4">
-          {loading ? (
-            <p>Loading...</p>
-          ) : user ? (
-            <>
-              <h1>Welcome, {user.first_name}!</h1>
-              <div className="card mt-4">
-                <div className="card-body">
-                  <h5>Profile Info</h5>
-                  <p><strong>Name:</strong> {user.first_name} {user.last_name}</p>
-                  <p><strong>Email:</strong> {user.email}</p>
-                </div>
-              </div>
-            </>
-          ) : (
-            <p>No user data</p>
-          )}
-        </main>
-      </div>
-    </div>
+    <main className="flex-grow-1 p-4">
+      {loading ? (
+        <p>Loading...</p>
+      ) : user ? (
+        <>
+          <h1>Welcome, {user.first_name}!</h1>
+          <div className="card mt-4">
+            <div className="card-body">
+              <h5>Profile Info</h5>
+              <p><strong>Name:</strong> {user.first_name} {user.last_name}</p>
+              <p><strong>Email:</strong> {user.email}</p>
+            </div>
+          </div>
+        </>
+      ) : (
+        <p>No user data</p>
+      )}
+    </main>
   );
 }
 

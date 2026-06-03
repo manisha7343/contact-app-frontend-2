@@ -28,7 +28,6 @@ function Register() {
       } else {
         toast.error(data.message);
       }
-      
     } catch (error) {
       toast.error("Error: " + error.message);
     } finally {
@@ -46,24 +45,56 @@ function Register() {
               <form onSubmit={handleSubmit}>
                 <div className="mb-3">
                   <label className="form-label">First Name</label>
-                  <input type="text" className="form-control" value={first_name} onChange={(e) => setFirst_name(e.target.value)} required />
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={first_name}
+                    onChange={(e) => setFirst_name(e.target.value)}
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Last Name</label>
-                  <input type="text" className="form-control" value={last_name} onChange={(e) => setLast_name(e.target.value)} required />
+                  <input
+                    type="text"
+                    className="form-control"
+                    value={last_name}
+                    onChange={(e) => setLast_name(e.target.value)}
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Email</label>
-                  <input type="email" className="form-control" value={email} onChange={(e) => setEmail(e.target.value)} required />
+                  <input
+                    type="email"
+                    className="form-control"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    required
+                  />
                 </div>
                 <div className="mb-3">
                   <label className="form-label">Password</label>
-                  <input type="password" className="form-control" value={password} onChange={(e) => setPassword(e.target.value)} required />
+                  <input
+                    type="password"
+                    className="form-control"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                  />
                 </div>
-                <button type="submit" className="btn btn-primary w-100" disabled={loading}>{loading ? "Registering..." : "Register"}</button>
+                <button
+                  type="submit"
+                  className="btn btn-primary w-100"
+                  disabled={loading}
+                >
+                  {loading ? "Registering..." : "Register"}
+                </button>
               </form>
               <div className="mt-3 text-center">
-                <p>Already have account? <Link to="/login">Login</Link></p>
+                <p>
+                  Already have account? <Link to="/login">Login</Link>
+                </p>
               </div>
             </div>
           </div>

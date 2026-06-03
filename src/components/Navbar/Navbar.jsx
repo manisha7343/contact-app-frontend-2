@@ -1,15 +1,10 @@
 import { Link } from "react-router-dom";
 
-function Navbar({ onLogout, userName }) {
+function Navbar() {
   return (
     <>
       <nav className="navbar navbar-expand-lg bg-primary" data-bs-theme="dark">
         <div className="container-fluid">
-
-
-          {/* ---------------------------sidebar------------------------------ */}
-          {/* <Sidebar></Sidebar> */}
-          {/* -------------------------------------------------------------- */}
 
           {/* Sidebar toggle (mobile) */}
           <button
@@ -28,7 +23,7 @@ function Navbar({ onLogout, userName }) {
           </Link>
 
           {/* Mobile Navbar Toggle Button */}
-          <button
+          {/* <button
             className="navbar-toggler"
             type="button"
             data-bs-toggle="collapse"
@@ -38,7 +33,7 @@ function Navbar({ onLogout, userName }) {
             aria-label="Toggle navigation"
           >
             <span className="navbar-toggler-icon"></span>
-          </button>
+          </button> */}
 
           {/* Navbar Content */}
           <div
@@ -120,7 +115,7 @@ function Navbar({ onLogout, userName }) {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
 
             {/* Center Search */}
-            <div className="mx-auto d-flex col-sm-6" role="search">
+            {/* <div className="mx-auto d-flex col-sm-6" role="search">
               <input
                 className="form-control me-2 text-dark bg-light border-light rounded-5"
                 type="search"
@@ -131,15 +126,20 @@ function Navbar({ onLogout, userName }) {
               <button className="btn btn-outline-light" type="button">
                 Search
               </button>
-            </div>
+            </div> */}
 
             {/* Right: user + logout */}
-            <div className="d-flex align-items-center ms-auto gap-2">
-              <span className="text-white small me-2">👤 {userName || "User"}</span>
+
+
+
+
+
+            {/* <div className="d-flex align-items-center ms-auto gap-2">
+              <span className="text-white small me-2">👤 USer</span>
               <button className="btn btn-danger btn-sm" type="button" onClick={onLogout}>
                 Logout
               </button>
-            </div>
+            </div> */}
 
           </div>
           </div>

@@ -21,20 +21,25 @@ function Sidebar() {
       </div>
 
       <div className="list-group px-2">
-        <Link to="/dashboard" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
+        <Link to="/Dashboard" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
           <span className={styles.menuIcon}>📊</span>
           <span>Dashboard</span>
         </Link>
 
-        <Link to="/contacts" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
+        <Link to="/Contacts" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
           <span className={styles.menuIcon}>👥</span>
           <span>Contacts</span>
         </Link>
 
-        <Link to="/profile" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
+        <Link to="/Profile" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
           <span className={styles.menuIcon}>⚙️</span>
           <span>Profile</span>
         </Link>
+        <Link to="/Login" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
+          <span className={styles.menuIcon}>➡️</span>
+          <span>Logout</span>
+        </Link>
+
       </div>
 
       <div className={styles.footerNote}>Tip: Keep your contacts updated.</div>

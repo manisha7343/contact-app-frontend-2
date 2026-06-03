@@ -1,12 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import Navbar from "../../components/Navbar/Navbar";
-import Sidebar from "../../components/Sidebar/Sidebar";
 
-function getProfile() {
+function Profile() {
   const navigate = useNavigate();
-  const [profile, setProfile] = useState([]);
+  const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -18,18 +16,20 @@ function getProfile() {
       return;
     }
 
-    const Profile = async () => {
+    //2. function to fetch profile form backend
+    const fetchProfile = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:3001/api/contacts", {
+        const response = await fetch("http://localhost:3001/api/user/profile", {
           method: "GET",
           headers: { Authorization: `Bearer ${token}` },
         });
 
+        //data = response
         const data = await response.json();
 
         if (data.success) {
-          setProfile(data.user.firstname);
+          setUser(data.user);
         } else {
           toast.error(data.message);
         }
@@ -40,38 +40,27 @@ function getProfile() {
       }
     };
 
-    getProfile();
+    fetchProfile();
   }, [navigate]);
 
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-  };
-
   return (
-    <div>
-      <Navbar onLogout={handleLogout} />
-      <div className="d-flex">
-        <Sidebar />
-        <main className="flex-grow-1 p-4">
-          <h1>Contacts</h1>
+    <main className="flex-grow-1 p-4">
+      <h1>Profile</h1>
+      {loading && <p>Loading...</p>}
 
-          {loading ?   <p>Loading...</p> : "") 
-            <div className="card">
-              <div className="card-body">
-                <ul>
-                {Profile}
-                  </ul>
-                
-                  <p>No contacts yet</p>
-                )}
-              </div>
-            </div>
-          )}
-        </main>
-      </div>
-    </div>
+      {!loading && user && (
+        <div className="card">
+          <div className="card-body">
+            <ul>
+              <li>{user.first_name}</li>
+              <li>{user.last_name}</li>
+              <li>{user.email}</li>
+            </ul>
+          </div>
+        </div>
+      )}
+    </main>
   );
 }
 
-export default Profile          ;
+export default Profile;

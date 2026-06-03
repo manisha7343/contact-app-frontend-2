@@ -5,6 +5,8 @@ import VerifyEmail from "../pages/VerifyEmail/VerifyEmail";
 import Dashboard from "../pages/Dashboard/Dashboard";
 import Login from "../pages/Login/Login";
 import Contacts from "../pages/Contacts/Contacts";
+import Profile from "../pages/Profile/Profile";
+import Layout from "../components/Layout/Layout";
 
 function AppRoutes() {
   return (
@@ -12,8 +14,9 @@ function AppRoutes() {
       <Route path="/" element={<Register />} />
       <Route path="/login" element={<Login />} />
       <Route path="/verify-email" element={<VerifyEmail />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/contacts" element={<Contacts />} />
+      <Route path="/Dashboard" element={<Layout><Dashboard /></Layout>} />
+      <Route path="/Contacts" element={<Layout><Contacts /></Layout>} />
+      <Route path="/Profile" element={<Layout><Profile /></Layout>} />
     </Routes>
   );
 }

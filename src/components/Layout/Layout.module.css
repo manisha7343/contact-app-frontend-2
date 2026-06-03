@@ -1,0 +1,18 @@
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f8f9fa;
+}
+
+.contentArea {
+  display: flex;
+  width: 100%;
+  min-height: calc(100vh - 56px);
+}
+
+.mainContent {
+  flex: 1;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+}

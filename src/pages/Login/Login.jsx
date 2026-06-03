@@ -2,12 +2,17 @@ import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
 
+//usetstae aur use effct use krenge isko likhne k liye ham badme
+
 function Login() {
+
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
+
+ 
 
   const handleLogin = async (e) => {
     e.preventDefault();
