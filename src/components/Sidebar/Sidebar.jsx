@@ -1,24 +1,70 @@
 import { Link } from "react-router-dom";
 import styles from "./Sidebar.module.css";
+import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 function Sidebar() {
-  const userName = typeof window !== "undefined" ? localStorage.getItem("userName") || "User" : "User";
-  const initials = userName
-    .split(" ")
-    .map((n) => n[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
+  const navigate = useNavigate();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    //1. token check kro
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    //2. function to fetch profile from backend
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        const response = await fetch("http://localhost:3001/api/user/profile", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          setUser(data.user);
+          console.log("data user -----------------------",data.user);
+          
+        } else {
+          toast.error(data.message);
+        }
+      } catch (error) {
+        toast.error("Error: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [navigate]);
+
+    
+  const initials = user && user.first_name
+  ? user.first_name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+  : "U";
 
   const menu = (
     <>
-      <div className={styles.profileArea}>
-        <div className={styles.avatar}>{initials}</div>
-        <div>
-          <div className={styles.userName}>{userName}</div>
-          <div className={styles.userRole}>Member</div>
+      {loading ? (
+        <div className="text-center p-3">Loading...</div>
+      ) : user ? (
+        <div className={styles.profileArea}>
+          <div className={styles.avatar}>{initials}</div>
+          <div>
+            <div className={styles.userName}>{user.first_name} {user.last_name}</div>
+            <div className={styles.userRole}>{user.email}</div> 
+          </div>
         </div>
-      </div>
+      ) : (
+        <div className="text-center p-3 text-muted">No profile loaded</div>
+      )}
 
       <div className="list-group px-2">
         <Link to="/Dashboard" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
@@ -35,11 +81,11 @@ function Sidebar() {
           <span className={styles.menuIcon}>⚙️</span>
           <span>Profile</span>
         </Link>
+        
         <Link to="/Login" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
           <span className={styles.menuIcon}>➡️</span>
           <span>Logout</span>
         </Link>
-
       </div>
 
       <div className={styles.footerNote}>Tip: Keep your contacts updated.</div>
@@ -48,7 +94,7 @@ function Sidebar() {
 
   return (
     <>
-      {/* Offcanvas for small screens */}
+      {/* Mobile Offcanvas Sidebar */}
       <div className="offcanvas offcanvas-start" tabIndex="-1" id="sidebarOffcanvas" aria-labelledby="sidebarOffcanvasLabel">
         <div className="offcanvas-header">
           <h5 className="offcanvas-title" id="sidebarOffcanvasLabel">Menu</h5>
@@ -57,8 +103,8 @@ function Sidebar() {
         <div className="offcanvas-body p-0">{menu}</div>
       </div>
 
-      {/* Static sidebar for large screens */}
-      <aside className={`${styles.sidebar} d-none d-lg-block`}>
+      {/* Large screen Sidebar (Yahan "pt-5 mt-4" joda hai navbar ke piche na chhupne ke liye) */}
+      <aside className={`${styles.sidebar} d-none d-lg-block pt-2`}>
         {menu}
       </aside>
     </>

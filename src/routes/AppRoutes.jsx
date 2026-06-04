@@ -1,9 +1,10 @@
 import { Routes, Route } from "react-router-dom";
 
 import Register from "../pages/Register/Register";
+import Login from "../pages/Login/Login";
 import VerifyEmail from "../pages/VerifyEmail/VerifyEmail";
 import Dashboard from "../pages/Dashboard/Dashboard";
-import Login from "../pages/Login/Login";
+
 import Contacts from "../pages/Contacts/Contacts";
 import Profile from "../pages/Profile/Profile";
 import Layout from "../components/Layout/Layout";

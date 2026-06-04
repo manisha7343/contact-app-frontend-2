@@ -26,6 +26,8 @@
   align-items: center;
   justify-content: center;
   font-weight: 700;
+  font-size: 16px;   /* ✅ add karo */
+  flex-shrink: 0;    /* ✅ add karo — ye squeeze hone se rokta hai */
 }
 
 .userName {
