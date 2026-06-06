@@ -67,24 +67,24 @@ function Sidebar() {
       )}
 
       <div className="list-group px-2">
-        <Link to="/Dashboard" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
-          <span className={styles.menuIcon}>📊</span>
-          <span>Dashboard</span>
-        </Link>
+      <Link to="/Dashboard" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
+        <i className="fa-solid fa-chart-line" style={{ color: "rgb(54, 131, 232)" }}></i>
+        <span> Dashboard</span>
+      </Link>
 
         <Link to="/Contacts" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
-          <span className={styles.menuIcon}>👥</span>
-          <span>Contacts</span>
+          <i className="fa-solid fa-phone" style={{ color: "rgb(55, 115, 238)" }}></i>
+          <span> Contacts</span>
         </Link>
 
         <Link to="/Profile" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
-          <span className={styles.menuIcon}>⚙️</span>
-          <span>Profile</span>
+          <i className="fa-solid fa-user" style={{ color: "rgb(55, 115, 238)" }}></i>
+          <span> Profile</span>
         </Link>
         
         <Link to="/Login" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
-          <span className={styles.menuIcon}>➡️</span>
-          <span>Logout</span>
+          <i class="fa-solid fa-arrow-right-from-bracket" style={{ color: "rgb(238, 116, 116)"}}></i>          
+          <span> Logout</span>
         </Link>
       </div>
 

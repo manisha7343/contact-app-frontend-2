@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import styles from "./Contacts.module.css"; 
 
 function Contacts() {
   const navigate = useNavigate();
@@ -30,13 +31,12 @@ function Contacts() {
         //3. reponse isstore in data variable
         const data = await response.json();
 
-        //if response is success then store it in the state
         if (data.success) {
           setContacts(data.data || []); 
           setTotalPages(data.totalPages);
-          console.log("data pages-------------------------------",data.page);
-          console.log("data-------------------------------",data);
-          console.log("totalPages ------------------------=", data.totalPages);
+          // console.log("data pages-------------------------------",data.page);
+          // console.log("data-------------------------------",data);
+          // console.log("totalPages ------------------------=", data.totalPages);
         } else {
           toast.error(data.message);
         }
@@ -65,7 +65,6 @@ function Contacts() {
   return (
     <>
       {/* ------ search contact----------------- */}
-      {/* type="button" lagaya hai taaki page refresh na ho */}
       <div className="mx-auto d-flex col-sm-8" role="search">
         <input
           className="form-control me-2 text-dark bg-light border-primary rounded-5"
@@ -79,26 +78,44 @@ function Contacts() {
       </div>
       <br />
 
-      {/* -------- contacts----------------------  */}
+      {/* -------- contacts list ----------------------  */}
       {loading ? (
         <p>Loading...</p>
       ) : contacts.length > 0 ? (
-        <ol className="list-group list-group-numbered">
-          {contacts.map((contact) => (
-            <li
-              key={contact._id}
-              className="list-group-item d-flex justify-content-between align-items-start"
-            >
-              <div className="ms-2 me-auto">
-                <div className="fw-bold">{contact.name}</div>
-                {contact.phone}
-              </div>
+        <ol className="list-group">
+          {contacts.map((contact) => {
+            // Har ek contact ka initial nikalne ke liye logic
+            const contactInitial = contact.name 
+              ? contact.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+              : "C";
 
-              <span className="badge text-bg-primary align-right rounded-pill">
-                {contact.tags}
-              </span>
-            </li>
-          ))}
+            return (
+              <li
+                key={contact._id}
+                className="list-group-item d-flex justify-content-between align-items-center py-3"
+              >
+                {/* Left side: Avatar + Info */}
+                <div className="d-flex align-items-center gap-3">
+                  
+                  {/* Gradient Avatar Icon */}
+                  <div className={styles.avatar}>
+                    {contactInitial}
+                  </div>
+
+                  {/* Name and Phone */}
+                  <div>
+                    <div className="fw-bold mb-1">{contact.name}</div>
+                    <span className="text-muted small">{contact.phone}</span>
+                  </div>
+                </div>
+
+                {/* Right side: Badge Tags */}
+                <span className="badge text-bg-primary rounded-pill px-2 py-1 fs-7">
+                  {contact.tags}
+                </span>
+              </li>
+            );
+          })}
         </ol>
       ) : (
         <p>No contacts found</p>
@@ -108,7 +125,6 @@ function Contacts() {
       <nav aria-label="Page navigation example" className="mt-4">
         <ul className="pagination justify-content-center">
 
-          {/* Previous Button */}
           <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
             <button
               type="button"
@@ -120,7 +136,6 @@ function Contacts() {
             </button>
           </li>
 
-          {/* Sahi numbers Bootstrap design ke sath */}
           {visiblePages.map((pageNumber) => (
             <li
               key={pageNumber}
@@ -136,7 +151,6 @@ function Contacts() {
             </li>
           ))}
 
-          {/* Next Button */}
           <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
             <button
               type="button"
