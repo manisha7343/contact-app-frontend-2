@@ -1,169 +1,188 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import styles from "./Contacts.module.css"; 
+import styles from "./Contacts.module.css";
+
+import ContactSearch from "../../components/Contacts/ContactSearch";
+import ContactList from "../../components/Contacts/ContactList";
+import ContactPagination from "../../components/Contacts/ContactPagination";
+import ContactEditModal from "../../components/Contacts/ContactEditModal";
+import ContactDeleteConfirm from "../../components/Contacts/ContactDeleteConfirm";
 
 function Contacts() {
   const navigate = useNavigate();
   const [contacts, setContacts] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [page, setpage] = useState(1);
+  const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [searchInput, setSearchInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [editingContact, setEditingContact] = useState(null);
+  const [contactToDelete, setContactToDelete] = useState(null);
 
   useEffect(() => {
-    //1. token check kro nhi hai toho feko login per
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
+    const fetchContacts = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+        return;
+      }
 
-    //function to fetch contacts from backend
-    const getContacts = async () => {
       try {
         setLoading(true);
-        //2. fetch contacts
-        const response = await fetch(`http://localhost:3001/api/contacts?page=${page}`, {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const response = await fetch(
+          `http://localhost:3001/api/contacts?page=${page}&search=${searchInput}`,
+          {
+            method: "GET",
+            headers: { Authorization: `Bearer ${token}` },
+          },
+        );
 
-        //3. reponse isstore in data variable
         const data = await response.json();
 
         if (data.success) {
-          setContacts(data.data || []); 
+          setContacts(data.data || []);
           setTotalPages(data.totalPages);
-          // console.log("data pages-------------------------------",data.page);
-          // console.log("data-------------------------------",data);
-          // console.log("totalPages ------------------------=", data.totalPages);
         } else {
           toast.error(data.message);
         }
       } catch (error) {
         toast.error("Error: " + error.message);
       } finally {
-        setLoading(false); 
+        setLoading(false);
       }
     };
 
-    getContacts();
-  }, [navigate, page]);
+    fetchContacts();
+  }, [navigate, page, searchInput]);
 
-  // ==================== BOOTSTRAP PAGINATION WINDOW LOGIC ====================
-  const maxVisiblePages = 5;
-  let startPage = Math.max(1, page - Math.floor(maxVisiblePages / 2));
-  let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
 
-  if (endPage - startPage + 1 < maxVisiblePages) {
-    startPage = Math.max(1, endPage - maxVisiblePages + 1);
-  }
+  // ⭐ FUNCTION 1: Favorite Toggle Karne Ke Liye
+  const handleToggleFavorite = async (contact) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`http://localhost:3001/api/contacts/${contact._id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          ...contact,
+          isFavorite: !contact.isFavorite, // Toggle value
+        }),
+      });
 
-  const visiblePages = Array.from({ length: endPage - startPage + 1 }, (_, i) => startPage + i);
-  // ===========================================================================
+      const data = await response.json();
+
+      if (data.success || data.sucess) {
+        toast.success(contact.isFavorite ? "Removed from favorites" : "Added to favorites");
+        // Frontend state update karo turant color change dekhne ke liye
+        setContacts((prev) =>
+          prev.map((c) => (c._id === contact._id ? { ...c, isFavorite: !c.isFavorite } : c))
+        );
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Error updating favorite status: " + error.message);
+    }
+  };
+
+
+  // 🗑️ FUNCTION 2: Soft Delete Ke Liye (isDeleted: true)
+  const handleSoftDelete = async (id) => {
+    const token = localStorage.getItem("token");
+    try {
+      const response = await fetch(`http://localhost:3001/api/contacts/${id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({
+          isDeleted: true, // Backend logic ke liye true pass kiya
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success || data.sucess) {
+        toast.success("Contact deleted successfully");
+        setContacts((prev) => prev.filter((c) => c._id !== id));
+        setContactToDelete(null);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error("Error deleting contact: " + error.message);
+    }
+  };
+
+  const handleEditContact = (contact) => {
+    setEditingContact(contact);
+  };
+
+  const handleRequestDelete = (contact) => {
+    setContactToDelete(contact);
+  };
+
+  const handleConfirmDelete = () => {
+    if (contactToDelete) {
+      handleSoftDelete(contactToDelete._id);
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setContactToDelete(null);
+  };
+
+  const handleUpdateContact = (updatedContact) => {
+    setContacts((prev) =>
+      prev.map((c) => (c._id === updatedContact._id ? updatedContact : c))
+    );
+    setEditingContact(null);
+  };
 
   return (
     <>
-      {/* ------ search contact----------------- */}
-      <div className="mx-auto d-flex col-sm-8" role="search">
-        <input
-          className="form-control me-2 text-dark bg-light border-primary rounded-5"
-          type="search"
-          placeholder="Search contacts..."
-          aria-label="Search"
+      {/* ------ search Input ----------------- */}
+      <ContactSearch
+        searchInput={searchInput}
+        setSearchInput={setSearchInput}
+      />
+
+      {/* ----------conatcts list ------------- */}
+      <ContactList 
+        contacts={contacts} 
+        loading={loading} 
+        styles={styles} 
+        onToggleFavorite={handleToggleFavorite} // Pass function to list
+        onDeleteContact={handleRequestDelete}     // Open confirm modal
+        onEditContact={handleEditContact}
+      />
+
+      {editingContact && (
+        <ContactEditModal
+          contact={editingContact}
+          onClose={() => setEditingContact(null)}
+          onSave={handleUpdateContact}
         />
-        <button className="btn btn-primary" type="button">
-          Search
-        </button>
-      </div>
-      <br />
+      )}
 
-      {/* -------- contacts list ----------------------  */}
-      {loading ? (
-        <p>Loading...</p>
-      ) : contacts.length > 0 ? (
-        <ol className="list-group">
-          {contacts.map((contact) => {
-            // Har ek contact ka initial nikalne ke liye logic
-            const contactInitial = contact.name 
-              ? contact.name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
-              : "C";
-
-            return (
-              <li
-                key={contact._id}
-                className="list-group-item d-flex justify-content-between align-items-center py-3"
-              >
-                {/* Left side: Avatar + Info */}
-                <div className="d-flex align-items-center gap-3">
-                  
-                  {/* Gradient Avatar Icon */}
-                  <div className={styles.avatar}>
-                    {contactInitial}
-                  </div>
-
-                  {/* Name and Phone */}
-                  <div>
-                    <div className="fw-bold mb-1">{contact.name}</div>
-                    <span className="text-muted small">{contact.phone}</span>
-                  </div>
-                </div>
-
-                {/* Right side: Badge Tags */}
-                <span className="badge text-bg-primary rounded-pill px-2 py-1 fs-7">
-                  {contact.tags}
-                </span>
-              </li>
-            );
-          })}
-        </ol>
-      ) : (
-        <p>No contacts found</p>
+      {contactToDelete && (
+        <ContactDeleteConfirm
+          contact={contactToDelete}
+          onCancel={handleCancelDelete}
+          onConfirm={handleConfirmDelete}
+        />
       )}
 
       {/* ----- Bootstrap Pagination ----------------------- */}
-      <nav aria-label="Page navigation example" className="mt-4">
-        <ul className="pagination justify-content-center">
-
-          <li className={`page-item ${page === 1 ? "disabled" : ""}`}>
-            <button
-              type="button"
-              className="page-link"
-              onClick={() => setpage(page - 1)}
-              disabled={page === 1}
-            >
-              Previous
-            </button>
-          </li>
-
-          {visiblePages.map((pageNumber) => (
-            <li
-              key={pageNumber}
-              className={`page-item ${page === pageNumber ? "active" : ""}`}
-            >
-              <button
-                type="button"
-                className="page-link"
-                onClick={() => setpage(pageNumber)}
-              >
-                {pageNumber}
-              </button>
-            </li>
-          ))}
-
-          <li className={`page-item ${page === totalPages ? "disabled" : ""}`}>
-            <button
-              type="button"
-              className="page-link"
-              onClick={() => setpage(page + 1)}
-              disabled={page === totalPages}
-            >
-              Next
-            </button>
-          </li>
-
-        </ul>
-      </nav>
+      <ContactPagination
+        page={page}
+        setPage={setPage}
+        totalPages={totalPages}
+      />
     </>
   );
 }

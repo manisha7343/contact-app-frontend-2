@@ -53,7 +53,10 @@ function Dashboard() {
           <h1>Welcome, {user.first_name}!</h1>
           <div className="card mt-4">
             <div className="card-body">
-              <h5>Profile Info</h5>
+              <span class="d-block p-2 text-bg-primary">
+              <h3> <b> Profile Information </b></h3>
+              </span>
+              <br />
               <p><strong>Name:</strong> {user.first_name} {user.last_name}</p>
               <p><strong>Email:</strong> {user.email}</p>
             </div>

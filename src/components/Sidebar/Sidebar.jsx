@@ -83,7 +83,7 @@ function Sidebar() {
         </Link>
         
         <Link to="/Login" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
-          <i class="fa-solid fa-arrow-right-from-bracket" style={{ color: "rgb(238, 116, 116)"}}></i>          
+          <i className="fa-solid fa-arrow-right-from-bracket" style={{ color: "rgb(238, 116, 116)"}}></i>          
           <span> Logout</span>
         </Link>
       </div>
