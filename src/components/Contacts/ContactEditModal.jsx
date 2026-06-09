@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "react-toastify";
 
 const ContactEditModal = ({ contact, onClose, onSave }) => {
+  const isEditMode = Boolean(contact && contact._id);
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     name: String(contact?.name || ""),
@@ -28,41 +29,52 @@ const ContactEditModal = ({ contact, onClose, onSave }) => {
 
     try {
       setSaving(true);
-      const response = await fetch(`http://localhost:3001/api/contacts/${contact._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          name: normalizedName,
-          phone: normalizedPhone,
-          email: normalizedEmail,
-          tags: normalizedTags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-        }),
-      });
+      const response = await fetch(
+        isEditMode
+          ? `http://localhost:3001/api/contacts/${contact._id}`
+          : `http://localhost:3001/api/contacts/`,
+        {
+          method: isEditMode ? "PUT" : "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            name: normalizedName,
+            phone: normalizedPhone,
+            email: normalizedEmail,
+            tags: normalizedTags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean),
+          }),
+        }
+      );
 
       const data = await response.json();
       if (data.success || data.sucess) {
-        toast.success("Contact updated successfully!");
-        onSave({
-          ...contact,
-          name: normalizedName,
-          phone: normalizedPhone,
-          email: normalizedEmail,
-          tags: normalizedTags
-            .split(",")
-            .map((tag) => tag.trim())
-            .filter(Boolean),
-        });
+        toast.success(isEditMode ? "Contact updated successfully!" : "Contact created successfully!");
+
+        const savedContact =
+          data.contact ||
+          data.data ||
+          ({
+            ...contact,
+            name: normalizedName,
+            phone: normalizedPhone,
+            email: normalizedEmail,
+            tags: normalizedTags
+              .split(",")
+              .map((tag) => tag.trim())
+              .filter(Boolean),
+          });
+
+        onSave(savedContact);
       } else {
-        toast.error(data.message || "Unable to update contact.");
+        toast.error(data.message || (isEditMode ? "Unable to update contact." : "Unable to create contact."));
       }
     } catch (error) {
-      toast.error("Update failed: " + error.message);
+      toast.error((isEditMode ? "Update" : "Create") + " failed: " + error.message);
     } finally {
       setSaving(false);
     }
@@ -84,7 +96,7 @@ const ContactEditModal = ({ contact, onClose, onSave }) => {
       <div className="modal-dialog modal-dialog-centered">
         <div className="modal-content shadow-lg border-0 rounded-3">
           <div className="modal-header bg-light border-bottom-0 pt-4 px-4">
-            <h5 className="modal-title fw-bold text-dark">Edit Contact</h5>
+            <h5 className="modal-title fw-bold text-dark">{isEditMode ? "Edit Contact" : "Create Contact"}</h5>
             <button
               type="button"
               className="btn-close"

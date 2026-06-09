@@ -9,6 +9,12 @@ function Sidebar() {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userName");
+    navigate("/login", { replace: true });
+  };
+
   useEffect(() => {
     //1. token check kro
     const token = localStorage.getItem("token");
@@ -82,10 +88,14 @@ function Sidebar() {
           <span> Profile</span>
         </Link>
         
-        <Link to="/Login" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
-          <i className="fa-solid fa-arrow-right-from-bracket" style={{ color: "rgb(238, 116, 116)"}}></i>          
+        <button
+          type="button"
+          className={`list-group-item list-group-item-action ${styles.menuItem}`}
+          onClick={handleLogout}
+        >
+          <i className="fa-solid fa-arrow-right-from-bracket" style={{ color: "rgb(238, 116, 116)"}}></i>
           <span> Logout</span>
-        </Link>
+        </button>
       </div>
 
       <div className={styles.footerNote}>Tip: Keep your contacts updated.</div>

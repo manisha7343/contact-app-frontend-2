@@ -18,6 +18,7 @@ function Contacts() {
   const [loading, setLoading] = useState(false);
   const [editingContact, setEditingContact] = useState(null);
   const [contactToDelete, setContactToDelete] = useState(null);
+  const [showCreateModal, setShowCreateModal] = useState(false);
 
   useEffect(() => {
     const fetchContacts = async () => {
@@ -145,10 +146,11 @@ function Contacts() {
 
   return (
     <>
-      {/* ------ search Input ----------------- */}
+      {/* ------ search Input & Create Button --------- */}
       <ContactSearch
         searchInput={searchInput}
         setSearchInput={setSearchInput}
+        onCreateContact={() => setShowCreateModal(true)}
       />
 
       {/* ----------conatcts list ------------- */}
@@ -166,6 +168,17 @@ function Contacts() {
           contact={editingContact}
           onClose={() => setEditingContact(null)}
           onSave={handleUpdateContact}
+        />
+      )}
+
+      {showCreateModal && (
+        <ContactEditModal
+          contact={null}
+          onClose={() => setShowCreateModal(false)}
+          onSave={(newContact) => {
+            setContacts((prev) => [newContact, ...prev]);
+            setShowCreateModal(false);
+          }}
         />
       )}
 

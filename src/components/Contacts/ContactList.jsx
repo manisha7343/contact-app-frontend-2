@@ -6,7 +6,6 @@ const ContactList = ({ loading, contacts, styles, onToggleFavorite, onDeleteCont
     )
   }
 
-  // ⚠️ FIX: false ki jagah 0 check hoga array length ke liye
   if (contacts.length === 0) {
     return (
       <p className="text-center text-muted my-4">No contacts found</p>
@@ -49,7 +48,7 @@ const ContactList = ({ loading, contacts, styles, onToggleFavorite, onDeleteCont
 
               {/* Right side: Badge Tags + Action Buttons */}
               <div className="d-flex align-items-center gap-2">
-                
+
                 {/* Tag Badge */}
                 {contact.tags && contact.tags.length > 0 && (
                   <span className="badge text-bg-primary rounded-pill px-2 py-1 fs-7 me-2 text-capitalize">
@@ -70,7 +69,7 @@ const ContactList = ({ loading, contacts, styles, onToggleFavorite, onDeleteCont
                   ></i>
                 </button>
 
-                {/* ✏️ Edit Profile/Contact Button */}
+                {/* ✏️ Edit Contact Button */}
                 <button
                   type="button"
                   className="btn btn-outline-primary btn-sm rounded-circle d-flex align-items-center justify-content-center"
@@ -78,8 +77,7 @@ const ContactList = ({ loading, contacts, styles, onToggleFavorite, onDeleteCont
                   onClick={() => onEditContact(contact)}
                   title="Edit Contact"
                 >
-                  {/* <i className="fa-solid fa-pencil" style={{ fontSize: "12px" }}></i> */}
-                  <i class="fa-solid fa-user-pen" style={{color:" rgb(26, 99, 245)"},{fontSize:"12px"}}></i>
+                  <i className="fa-solid fa-user-pen" style={{ color: "rgb(26, 99, 245)", fontSize: "12px" }}></i>
                 </button>
 
                 {/* 🗑️ Delete Button (Soft delete triggers) */}
@@ -87,7 +85,7 @@ const ContactList = ({ loading, contacts, styles, onToggleFavorite, onDeleteCont
                   type="button"
                   className="btn btn-outline-danger btn-sm rounded-circle d-flex align-items-center justify-content-center"
                   style={{ width: "32px", height: "32px" }}
-                  onClick={() => onDeleteContact(contact._id)}
+                  onClick={() => onDeleteContact(contact)}
                   title="Delete Contact"
                 >
                   <i className="fa-solid fa-trash" style={{ fontSize: "12px" }}></i>
