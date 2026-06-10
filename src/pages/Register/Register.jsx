@@ -1,6 +1,7 @@
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
+import { authAPI } from "../../services/api";
 
 function Register() {
   const navigate = useNavigate();
@@ -14,13 +15,7 @@ function Register() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/api/auth/register", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ first_name, last_name, email, password }),
-      });
-
-      const data = await response.json();
+      const { data } = await authAPI.register(first_name, last_name, email, password);
 
       if (data.success) {
         toast.success("Registered Successfully!");

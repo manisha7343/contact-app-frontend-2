@@ -3,6 +3,7 @@ import styles from "./Sidebar.module.css";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { userAPI } from "../../services/api";
 
 function Sidebar() {
   const navigate = useNavigate();
@@ -16,33 +17,30 @@ function Sidebar() {
   };
 
   useEffect(() => {
-    //1. token check kro
+    // 1. token check kro
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
       return;
     }
 
-    //2. function to fetch profile from backend
+    // 2. function to fetch profile from backend
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:3001/api/user/profile", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { response, data } = await userAPI.getProfile();
 
-        const data = await response.json();
-
-        if (data.success) {
+        // ✅ SAFE CHECK: data aur response dono sahi milne chahiye
+        if (response && response.ok && data && data.success) {
           setUser(data.user);
-          console.log("data user -----------------------",data.user);
-          
+          console.log("data user -----------------------", data.user);
         } else {
-          toast.error(data.message);
+          // ✅ SAFE EXTRACTION: Agar data ya message na ho toh crash nahi karega
+          const errMsg = data?.message || "Profile load karne mein error aaya";
+          toast.error(errMsg);
         }
       } catch (error) {
-        toast.error("Error: " + error.message);
+        toast.error("Network Error: Backend se connection nahi ban paya", error.message);
       } finally {
         setLoading(false);
       }
@@ -51,32 +49,37 @@ function Sidebar() {
     fetchProfile();
   }, [navigate]);
 
-    
-  const initials = user && user.first_name
-  ? user.first_name.split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
-  : "U";
+  // ✅ Safe Initials Logic (User aur first_name dono double check ho rahe hain)
+  const initials = user && user.first_name && typeof user.first_name === "string"
+    ? user.first_name.trim().split(" ").map((n) => n[0]).slice(0, 2).join("").toUpperCase()
+    : "U";
 
   const menu = (
     <>
       {loading ? (
-        <div className="text-center p-3">Loading...</div>
+        <div className="text-center p-3">
+          <div className="spinner-border spinner-border-sm text-primary me-2" role="status"></div>
+          Loading...
+        </div>
       ) : user ? (
         <div className={styles.profileArea}>
           <div className={styles.avatar}>{initials}</div>
           <div>
-            <div className={styles.userName}>{user.first_name} {user.last_name}</div>
+            <div className={styles.userName} style={{ textTransform: "capitalize" }}>
+              {user.first_name} {user.last_name || ""}
+            </div>
             <div className={styles.userRole}>{user.email}</div> 
           </div>
         </div>
       ) : (
-        <div className="text-center p-3 text-muted">No profile loaded</div>
+        <div className="text-center p-3 text-muted small">No profile loaded</div>
       )}
 
       <div className="list-group px-2">
-      <Link to="/Dashboard" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
-        <i className="fa-solid fa-chart-line" style={{ color: "rgb(54, 131, 232)" }}></i>
-        <span> Dashboard</span>
-      </Link>
+        <Link to="/Dashboard" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
+          <i className="fa-solid fa-chart-line" style={{ color: "rgb(54, 131, 232)" }}></i>
+          <span> Dashboard</span>
+        </Link>
 
         <Link to="/Contacts" className={`list-group-item list-group-item-action ${styles.menuItem}`}>
           <i className="fa-solid fa-phone" style={{ color: "rgb(55, 115, 238)" }}></i>
@@ -113,7 +116,7 @@ function Sidebar() {
         <div className="offcanvas-body p-0">{menu}</div>
       </div>
 
-      {/* Large screen Sidebar (Yahan "pt-5 mt-4" joda hai navbar ke piche na chhupne ke liye) */}
+      {/* Large screen Sidebar */}
       <aside className={`${styles.sidebar} d-none d-lg-block pt-2`}>
         {menu}
       </aside>

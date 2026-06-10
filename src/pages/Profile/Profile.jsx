@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { userAPI } from "../../services/api";
 
 import ProfileImage from "../../components/profile.jsx/ProfileImage";
 import ProfileDetails from "../../components/profile.jsx/ProfileDetails";
@@ -23,12 +24,7 @@ function Profile() {
     const fetchProfile = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:3001/api/user/profile", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` }, // ⚠️ Check kar lena backend me Bearer space check ho raha hai ya direct token
-        });
-
-        const data = await response.json();
+        const { data } = await userAPI.getProfile();
 
         if (data.success) {
           setUser(data.user);
@@ -50,29 +46,11 @@ function Profile() {
     const file = e.target.files[0];
     if (!file) return;
 
-    // Postman ki tarah form-data banaya
-    const formData = new FormData();
-    formData.append("profilePic", file); // 👈 KEY ka naam bilkul sahi 'profilePic'
-
-    const token = localStorage.getItem("token");
-
     try {
       setUploading(true);
       toast.info("Uploading image...");
 
-      const response = await fetch(
-        "http://localhost:3001/api/user/upload-profile-pic",
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            // ⚠️ Dhyaan rakhna: FormData ke sath 'Content-Type' header MANUALLY MAT DAALNA, browser khud set karta hai.
-          },
-          body: formData, // JSON.stringify nahi karna hai, direct formData jayega
-        },
-      );
-
-      const data = await response.json();
+      const { data } = await userAPI.uploadProfileImage(file);
 
       if (data.success) {
         toast.success("Profile picture updated!");

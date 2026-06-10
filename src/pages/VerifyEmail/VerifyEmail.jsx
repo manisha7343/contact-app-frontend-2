@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { authAPI } from "../../services/api";
 
 function VerifyEmail() {
   const navigate = useNavigate();
@@ -15,12 +16,7 @@ function VerifyEmail() {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/api/auth/verify-email", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, code }),
-      });
-      const data = await response.json();
+      const { data } = await authAPI.verifyEmail(code);
       if (data.success) {
         toast.success("Email verified successfully!");
         navigate("/login");
@@ -28,7 +24,7 @@ function VerifyEmail() {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error("Error: " + error.message);
+      toast.error("Error : " + error.message);
     } finally {
       setLoading(false);
     }

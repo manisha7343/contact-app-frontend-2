@@ -1,32 +1,26 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { userAPI } from "../../services/api";
 
 const ProfileEditForm = ({ user, setUser, setEditProfileOption }) => {
   const [saving, setSaving] = useState(false);
 
   const handleSaveSubmit = async () => {
-    const token = localStorage.getItem("token");
     try {
       setSaving(true);
-      const response = await fetch(`http://localhost:3001/api/user/profile/${user._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          first_name: user.first_name,
-          last_name: user.last_name,
-        }),
+      
+      // API call
+      const { response, data } = await userAPI.updateProfile({
+        first_name: user.first_name,
+        last_name: user.last_name,
       });
 
-      const data = await response.json();
-
-      if (data.success) {
+      // ✅ SAFE CHECK: data aur response.ok dono check karo taaki website crash na ho
+      if (response && response.ok && data && data.success) {
         toast.success("Profile updated successfully!");
         setEditProfileOption(false);
       } else {
-        toast.error(data.message);
+        toast.error(data?.message || "Failed to update profile");
       }
     } catch (error) {
       toast.error("Failed to update profile: " + error.message);
@@ -61,7 +55,7 @@ const ProfileEditForm = ({ user, setUser, setEditProfileOption }) => {
               <input
                 type="text"
                 className="form-control text-capitalize py-2"
-                value={user.first_name || ""}
+                value={user?.first_name || ""}
                 onChange={(event) =>
                   setUser({ ...user, first_name: event.target.value })
                 }
@@ -73,7 +67,7 @@ const ProfileEditForm = ({ user, setUser, setEditProfileOption }) => {
               <input
                 type="text"
                 className="form-control text-capitalize py-2"
-                value={user.last_name || ""}
+                value={user?.last_name || ""}
                 onChange={(event) =>
                   setUser({ ...user, last_name: event.target.value })
                 }

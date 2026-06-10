@@ -1,6 +1,7 @@
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
+import { userAPI } from "../../services/api";
 
 function Dashboard() {
   const navigate = useNavigate();
@@ -17,10 +18,7 @@ function Dashboard() {
     const getProfile = async () => {
       try {
         setLoading(true);
-        const response = await fetch("http://localhost:3001/api/user/profile", {
-          method: "GET",
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const { response, data } = await userAPI.getProfile();
 
         if (response.status === 401) {
           localStorage.removeItem("token");
@@ -28,7 +26,6 @@ function Dashboard() {
           return;
         }
 
-        const data = await response.json();
         if (data.success) {
           setUser(data.user);
         } else {

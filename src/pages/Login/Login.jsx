@@ -1,35 +1,20 @@
 import { useNavigate, Link } from "react-router-dom";
 import { toast } from "react-toastify";
 import { useState } from "react";
-
-//usetstae aur use effct use krenge isko likhne k liye ham badme
+import { authAPI } from "../../services/api";
 
 function Login() {
-
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [showPwd, setShowPwd] = useState(false);
 
- 
-
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:3001/api/auth/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password }),
-      });
-
-      // try parse JSON body if any
-      let data = null;
-      const contentType = response.headers.get("content-type") || "";
-      if (contentType.includes("application/json")) {
-        data = await response.json().catch(() => null);
-      }
+      const { response, data } = await authAPI.login(email, password);
 
       // Handle unauthorized explicitly (invalid credentials / token issues)
       if (response.status === 401) {

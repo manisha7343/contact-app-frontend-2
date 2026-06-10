@@ -2,6 +2,7 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import styles from "./Contacts.module.css";
+import { contactAPI } from "../../services/api";
 
 import ContactSearch from "../../components/Contacts/ContactSearch";
 import ContactList from "../../components/Contacts/ContactList";
@@ -30,15 +31,7 @@ function Contacts() {
 
       try {
         setLoading(true);
-        const response = await fetch(
-          `http://localhost:3001/api/contacts?page=${page}&search=${searchInput}`,
-          {
-            method: "GET",
-            headers: { Authorization: `Bearer ${token}` },
-          },
-        );
-
-        const data = await response.json();
+        const { data } = await contactAPI.getContacts(page, searchInput);
 
         if (data.success) {
           setContacts(data.data || []);
@@ -59,21 +52,11 @@ function Contacts() {
 
   // ⭐ FUNCTION 1: Favorite Toggle Karne Ke Liye
   const handleToggleFavorite = async (contact) => {
-    const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:3001/api/contacts/${contact._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          ...contact,
-          isFavorite: !contact.isFavorite, // Toggle value
-        }),
+      const { data } = await contactAPI.updateContact(contact._id, {
+        ...contact,
+        isFavorite: !contact.isFavorite, // Toggle value
       });
-
-      const data = await response.json();
 
       if (data.success || data.sucess) {
         toast.success(contact.isFavorite ? "Removed from favorites" : "Added to favorites");
@@ -92,20 +75,8 @@ function Contacts() {
 
   // 🗑️ FUNCTION 2: Soft Delete Ke Liye (isDeleted: true)
   const handleSoftDelete = async (id) => {
-    const token = localStorage.getItem("token");
     try {
-      const response = await fetch(`http://localhost:3001/api/contacts/${id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          isDeleted: true, // Backend logic ke liye true pass kiya
-        }),
-      });
-
-      const data = await response.json();
+      const { data } = await contactAPI.deleteContact(id);
 
       if (data.success || data.sucess) {
         toast.success("Contact deleted successfully");

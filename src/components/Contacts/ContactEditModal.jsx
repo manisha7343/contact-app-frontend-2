@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { toast } from "react-toastify";
+import { contactAPI } from "../../services/api";
 
 const ContactEditModal = ({ contact, onClose, onSave }) => {
   const isEditMode = Boolean(contact && contact._id);
@@ -16,8 +17,7 @@ const ContactEditModal = ({ contact, onClose, onSave }) => {
   };
 
   const handleSave = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
+    if (!localStorage.getItem("token")) {
       toast.error("Authentication required.");
       return;
     }
@@ -27,31 +27,21 @@ const ContactEditModal = ({ contact, onClose, onSave }) => {
     const normalizedEmail = String(form.email || "").trim();
     const normalizedTags = String(form.tags || "");
 
+    const contactData = {
+      name: normalizedName,
+      phone: normalizedPhone,
+      email: normalizedEmail,
+      tags: normalizedTags
+        .split(",")
+        .map((tag) => tag.trim())
+        .filter(Boolean),
+    };
+
     try {
       setSaving(true);
-      const response = await fetch(
-        isEditMode
-          ? `http://localhost:3001/api/contacts/${contact._id}`
-          : `http://localhost:3001/api/contacts/`,
-        {
-          method: isEditMode ? "PUT" : "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            name: normalizedName,
-            phone: normalizedPhone,
-            email: normalizedEmail,
-            tags: normalizedTags
-              .split(",")
-              .map((tag) => tag.trim())
-              .filter(Boolean),
-          }),
-        }
-      );
-
-      const data = await response.json();
+      const { data } = isEditMode
+        ? await contactAPI.updateContact(contact._id, contactData)
+        : await contactAPI.createContact(contactData);
       if (data.success || data.sucess) {
         toast.success(isEditMode ? "Contact updated successfully!" : "Contact created successfully!");
 
